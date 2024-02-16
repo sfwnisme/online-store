@@ -10,6 +10,7 @@ const useSignedUser = () => {
       AXIOS.get(`${USER}`)
         .then((data) => {
           setCurrentUser(data.data)
+          console.log(':::get single data done:::', data)
         })
     } catch (error) {
       console.log('+++get single data error+++', error)

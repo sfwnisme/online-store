@@ -1,12 +1,14 @@
+import axios from "axios"
 import { useState } from "react"
 import Button from "react-bootstrap/Button"
 import Form from "react-bootstrap/Form"
+import Alert from "react-bootstrap/Alert"
+import { BASE_URL, LOGIN } from "../../Api/API"
+import Loading from "../../Loading/Loading/Loading"
 import PageLoading from "../../Loading/PageLoading/PageLoading"
-import { NavLink } from "react-router-dom"
+import Cookie from 'cookie-universal'
+import { NavLink, useNavigate } from "react-router-dom"
 import GoogleBtn from "../../Components/GoogleBtn"
-import { useDispatch, useSelector } from "react-redux"
-import { loginUser, loginUserSelector } from "../../Store/features/auth/loginSlice"
-import AlertMsg from "../../Components/AlertMsg"
 
 const Login = () => {
 
@@ -15,7 +17,17 @@ const Login = () => {
     email: '',
     password: '',
   })
-  const [isMsg, setIsMsg] = useState(false)
+  const [err, setErr] = useState('')
+  const [loading, setLoading] = useState(false)
+  //:::
+
+  //:::
+  const navigate = useNavigate()
+  // console.log(navigate.state)
+  //:::
+
+  //:::
+  const cookie = Cookie()
   //:::
 
   //:::
@@ -30,43 +42,38 @@ const Login = () => {
   }
   //:::
 
-  //:::
-  const { isLoading, isSuccess, isError, success, error } = useSelector(loginUserSelector)
-  //:::
 
   //:::
-  const dispatch = useDispatch()
   const Submit = async (e) => {
     e.preventDefault()
     try {
-      const res = await dispatch(loginUser(form)).unwrap()
-      setIsMsg(true)
-      const role = res?.user?.role
-      const go = role === '1995' ? '/dashboard/users' : role === '1996' ? '/dashboard/writer' : '/'
-      switch (role) {
-        case '1995':
-          'dashboard/users';
-          break;
-        case '1996':
-          'dashboard/writer';
-          break;
-        case '1999':
-          'dashboard/products';
-          break;
-        default:
-          '/';
-          break;
-      }
+      setLoading(true)
+      const res = await axios.post(`${BASE_URL}/${LOGIN}`, form)
+      const role = res.data.user.role
+      const go = role === '1995' ? 'dashboard/users' : role === '1996' ? 'dashboard/writer' : '/'
+      const token = res?.data?.token
+      setErr('')
+      setLoading(false)
       location.pathname = go
+      cookie.set('e-commerce', token)
+      console.log(':::lDogin done:::', res)
     } catch (error) {
-      setIsMsg(true)
+
+      if (error?.response?.status)
+        setErr('Invalid mail or password')
+      else
+        setErr('Internal server error')
+
+      setLoading(false)
+      console.log('+++login error+++', error)
+    } finally {
+      setLoading(false)
     }
   }
   //:::
-
   return (
     <div>
-      {isLoading && <PageLoading />}
+      {loading && <PageLoading />}
       <div className='form-container'>
         <div className='form-box'>
           <h1>Login</h1>
@@ -79,20 +86,24 @@ const Login = () => {
               <Form.Control type='password' id="password" name='password' placeholder="" value={form.password} onChange={handleChange} required minLength='6' />
               <Form.Label htmlFor="password">Password</Form.Label>
             </Form.Group>
-            <Button variant="primary" size="sm" type="submit" disabled={isLoading}>
+            <Button variant="primary" size="sm" type="submit" disabled={!!loading}>
               {
-                isLoading
-                  ? 'Get...'
+                loading
+                  ? <Loading />
                   : 'Get in'
               }
             </Button>
-            <NavLink to='/register' style={{ pointerEvents: isLoading ? 'none' : '' }}>
+            <NavLink to='/register'>
               <Button variant="link" size="sm">have not account</Button>
             </NavLink>
           </Form>
           <GoogleBtn />
-
-          <AlertMsg message={success?.message || error?.message} isError={isError} delay='3000' isMsg={isMsg} setIsMsg={setIsMsg} />
+          {
+            err &&
+            <Alert variant='danger' className='credentials-error'>
+              {err}
+            </Alert>
+          }
         </div>
         <div className="credential-image-container">
           <img src={srcImage} alt="" />

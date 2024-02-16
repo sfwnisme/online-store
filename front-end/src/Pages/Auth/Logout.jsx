@@ -1,8 +1,6 @@
 import Cookie from 'cookie-universal'
-import { LOGOUT } from '../../Api/API'
-import { AXIOS } from '../../Api/AXIOS.JSX'
-import { useState } from 'react'
-import PageLoading from '../../Loading/PageLoading/PageLoading'
+import { useDispatch, useSelector } from 'react-redux'
+import { logoutUser, logoutSelector } from '../../Store/features/auth/logoutSlice'
 
 const Logout = () => {
   //:::
@@ -10,12 +8,13 @@ const Logout = () => {
   //:::
 
   //:::
+  const { isLoading, isSuccess, isError, success, error } = useSelector(logoutSelector)
+  const dispatch = useDispatch()
   const handleLogout = async () => {
     try {
-      const res = await AXIOS.get(`/${LOGOUT}`)
+      const res = await dispatch(logoutUser()).unwrap()
       cookie.remove('e-commerce')
-      location.pathname = '/login'
-      console.log(':::logout done:::', res)
+      location.pathname = '/'
     } catch (error) {
       console.log('+++logout error+++', error)
     }
@@ -24,8 +23,12 @@ const Logout = () => {
 
   return (
     <>
-      <span onClick={handleLogout}>
-        Logout
+      <span onClick={handleLogout} >
+        {
+          isLoading
+            ? 'Logout...'
+            : 'Logout'
+        }
       </span >
     </>
   )

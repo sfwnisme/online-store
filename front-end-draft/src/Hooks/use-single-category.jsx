@@ -24,6 +24,7 @@ const useSingleCategory = () => {
       .then((data) => {
         setTitle(data?.data?.title)
         setDisable(false)
+        console.log(':::get category done:::', data)
       })
       .catch((error) => {
         setDisable(false)

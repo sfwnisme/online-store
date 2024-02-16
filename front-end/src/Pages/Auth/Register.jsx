@@ -1,14 +1,12 @@
-import axios from 'axios';
 import { useCallback, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { BASE_URL, REGISTER } from '../../Api/API';
-import Alert from 'react-bootstrap/Alert';
-import Loading from '../../Loading/Loading/Loading';
 import PageLoading from '../../Loading/PageLoading/PageLoading';
-import Cookie from 'cookie-universal'
 import { NavLink } from 'react-router-dom';
 import GoogleBtn from '../../Components/GoogleBtn';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerUser, registerUserSelector } from '../../Store/features/auth/registerSlice';
+import AlertMsg from '../../Components/AlertMsg';
 
 const Register = () => {
   //:::States
@@ -17,16 +15,7 @@ const Register = () => {
     email: '',
     password: '',
   })
-  const [err, setErr] = useState('')
-  const [loading, setLoading] = useState(false)
-  //:::
-
-  console.log(form.name)
-  console.log(form.email)
-  console.log(form.password)
-
-  //:::
-  const cookie = Cookie()
+  const [isMsg, setIsMsg] = useState(false)
   //:::
 
   //:::
@@ -42,32 +31,26 @@ const Register = () => {
   //:::
 
   //:::
+  const { isLoading, isSuccess, isError, success, error } = useSelector(registerUserSelector)
+  //:::
+
+  //:::
+  const dispatch = useDispatch()
   const Submit = async (e) => {
     e.preventDefault()
     try {
-      setLoading(true)
-      const res = await axios.post(`${BASE_URL}/${REGISTER}`, form)
-      setErr('')
-      setLoading(false)
-      cookie.set('e-commerce', res?.data?.token)
+      const res = await dispatch(registerUser(form)).unwrap()
+      setIsMsg(true)
       location.pathname = '/'
-      console.log(':::register done:::', res)
     } catch (error) {
-      if (error?.response?.status)
-        setErr('Email has already been taken')
-      else
-        setErr('Internal server error')
-      setLoading(false)
-      console.log('+++register error+++', error)
-    } finally {
-      setLoading(false)
+      setIsMsg(true)
     }
   }
   //:::
 
   return (
     <div>
-      {loading && <PageLoading />}
+      {isLoading && <PageLoading />}
       <div className='form-container'>
         <div className='form-box'>
           <h1>Register</h1>
@@ -84,10 +67,10 @@ const Register = () => {
               <Form.Control type='password' id="password" placeholder="" name='password' value={form.password} onChange={handleChange} required minLength='6' />
               <Form.Label htmlFor="password">Password</Form.Label>
             </Form.Group>
-            <Button variant='primary' size='sm' type="submit" disabled={!!loading} >
+            <Button variant='primary' size='sm' type="submit" disabled={isLoading} >
               {
-                loading
-                  ? <Loading />
+                isLoading
+                  ? 'Join...'
                   : 'Join us'
               }
             </Button>
@@ -96,12 +79,7 @@ const Register = () => {
             </NavLink>
           </Form>
           <GoogleBtn />
-          {
-            err &&
-            <Alert variant='danger' className='credentials-error'>
-              {err}
-            </Alert>
-          }
+          <AlertMsg message={success?.message || error?.message} isError={isError} delay='3000' isMsg={isMsg} setIsMsg={setIsMsg} />
         </div>
         <div className="credential-image-container">
           <img src={srcImage} alt="" />

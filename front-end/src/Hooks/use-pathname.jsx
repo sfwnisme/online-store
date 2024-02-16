@@ -1,8 +1,6 @@
 const usePathname = () => {
   const id = window.location.pathname.split('/').pop()
   const pathname = window.location.pathname
-  console.log(pathname)
-  console.log(id)
   return { id, pathname }
 }
 

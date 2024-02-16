@@ -7,17 +7,23 @@ import Navbar from 'react-bootstrap/Navbar';
 import { NavLink } from 'react-router-dom';
 import Cookie from 'cookie-universal';
 import getUserType from '../utils/getUserType';
-import useSignedUser from '../Hooks/use-signed-user';
+import { useEffect } from 'react';
+import { currentUserSelector, getCurrentUser } from '../Store/features/users/usersSlice';
+import { useDispatch, useSelector } from 'react-redux';
 const Header = () => {
   //:::
   const cookie = Cookie()
   let token = cookie.get('e-commerce')
-  //:::
+  // const [isToken, setIsToken] = useState(token)
 
+  const dispatch = useDispatch()
+  const { data: currentUser, isLoading, isEmpty, isError, error } = useSelector(currentUserSelector)
+  useEffect(() => {
+    token
+      ? dispatch(getCurrentUser())
+      : null
+  }, [dispatch, token])
   //:::
-  const { currentUser } = useSignedUser()
-  //:::
-
 
   return (
     <header>
@@ -30,7 +36,7 @@ const Header = () => {
               token &&
               <DropdownButton
                 size='sm'
-                title={`[${getUserType(currentUser?.role)}] ${currentUser?.name || "Loading..."}`}
+                title={`${getUserType(currentUser?.role) || 'loading...'} - ${currentUser && currentUser?.name || isLoading && "Loading..." || isEmpty && 'undefined' || isError && 'there is an error'}`}
               >
                 <Dropdown.Item size='sm'>
                   <Logout />

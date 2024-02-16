@@ -19,6 +19,7 @@ const GoogleCallBack = () => {
       try {
         const res = await axios.get(`${BASE_URL}/${GOOGLE_CALL_BACK}${search}`)
         cookie.set('e-commerce', res?.data?.access_token)
+        console.log(':::get google call done:::', res)
       } catch (error) {
         console.log('+++get google call error+++', error)
       }

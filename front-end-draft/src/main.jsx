@@ -6,31 +6,31 @@ import HomePage from './Pages/Website/HomePage.jsx'
 import Login from './Pages/Auth/Login.jsx'
 import Register from './Pages/Auth/Register.jsx'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Users from './Pages/Dashboard/Users/Users.jsx'
+import Users from './Pages/Dashboard/Users.jsx'
 import GoogleCallBack from './Pages/Auth/GoogleCallBack.jsx'
 import Dashboard from './Pages/Dashboard/Dashboard.jsx'
 import RequireAuth from './Pages/Auth/RequireAuth.jsx'
-import User from './Pages/Dashboard//Users/User.jsx'
-import AddUser from './Pages/Dashboard/Users/AddUser.jsx'
+import User from './Pages/Dashboard/User.jsx'
+import AddUser from './Pages/Dashboard/AddUser.jsx'
 import Writer from './Pages/Dashboard/Writer.jsx'
 import Err404 from './Pages/Auth/Err404.jsx'
 import RequireBack from './Pages/Auth/RequireBack.jsx'
-import Categories from "./Pages/Dashboard/Categories/Categories.jsx";
+import Categories from "./Pages/Dashboard/Categories.jsx";
 import Welcome from "./Pages/Dashboard/Welcome.jsx";
-import AddCategory from './Pages/Dashboard/Categories/AddCategory.jsx'
-import Category from './Pages/Dashboard/Categories/Category.jsx'
-import Products from './Pages/Dashboard/Products/Products.jsx'
-import AddProductCopy from './Pages/Dashboard/Products/AddProductCopy.jsx'
-import { Provider } from 'react-redux'
-import { store } from './Store/api/store.jsx'
-import AddProduct from './Pages/Dashboard/Products/AddProduct.jsx'
-import AddProductNew from './Pages/Dashboard/Products/AddProductNew.jsx'
+import AddCategory from './Pages/Dashboard/AddCategory.jsx'
+import Category from './Pages/Dashboard/Category.jsx'
+import Products from './Pages/Dashboard/Products.jsx'
+import AddProduct from './Pages/Dashboard/AddProduct.jsx'
 
 //::: users codes
-const admin = '1995'
-const productManager = '1999'
-const writer = '1996'
-// const user = '2001'
+const admin = ['1995']
+const productManager = ['1999']
+const writer = ['1996']
+// const user = ['2001']
+const adminAllowed = [...admin, ...writer, ...productManager]
+const productManagerAllowed = [...admin, ...productManager]
+const writerAllowed = [...admin, ...writer]
+console.log(adminAllowed)
 //:::
 
 const router = createBrowserRouter([
@@ -59,7 +59,7 @@ const router = createBrowserRouter([
             },
 
             {
-                element: <RequireAuth allowedRole={[admin, writer, productManager]} />,
+                element: <RequireAuth allowedRole={adminAllowed} />,
                 children: [
                     {
                         path: 'dashboard',
@@ -69,20 +69,8 @@ const router = createBrowserRouter([
                                 element: <Welcome />,
                                 index: true,
                             },
-                            // {
-                            //     element: <Users />,
-                            //     path: 'users'
-                            // },
-                            // {
-                            //     element: <User />,
-                            //     path: 'users/:id',
-                            // },
-                            // {
-                            //     element: <AddUser />,
-                            //     path: 'user/add'
-                            // },
                             {
-                                element: <RequireAuth allowedRole={[admin]} />,
+                                element: <RequireAuth allowedRole={writerAllowed} />,
                                 children: [
                                     {
                                         element: <Users />,
@@ -99,7 +87,7 @@ const router = createBrowserRouter([
                                 ]
                             },
                             {
-                                element: <RequireAuth allowedRole={[admin, productManager]} />,
+                                element: <RequireAuth allowedRole={productManagerAllowed} />,
                                 children: [
                                     //::: categories
                                     {
@@ -121,14 +109,12 @@ const router = createBrowserRouter([
                                     },
                                     {
                                         element: <AddProduct />,
-                                        // element: <AddProductCopy />,
-                                        // element: <AddProductNew />,
                                         path: 'product/add'
                                     }
                                 ]
                             },
                             {
-                                element: <RequireAuth allowedRole={['1995', '1996']} />,
+                                element: <RequireAuth allowedRole={writerAllowed} />,
                                 children: [
                                     {
                                         element: <Writer />,
@@ -150,8 +136,6 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     // <React.StrictMode>
-    <Provider store={store}>
-        <RouterProvider router={router} />
-    </Provider>
+    <RouterProvider router={router} />
     // </React.StrictMode>,
 )

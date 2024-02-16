@@ -26,6 +26,7 @@ const useSingleUser = () => {
         setName(data.data.name)
         setEmail(data.data.email)
         setRole(data.data.role)
+        console.log(':::get user done:::', data)
       })
       .catch((error) => {
         setDisable(false)

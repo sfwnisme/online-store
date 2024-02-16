@@ -4,69 +4,59 @@ import { Table } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faEdit } from "@fortawesome/free-solid-svg-icons";
 import getUserType from "../utils/getUserType.jsx";
-import ToastMsg from "../Pages/Dashboard/ToastMsg.jsx";
-import { AXIOS } from "../Api/AXIOS.JSX";
 import { useEffect, useState } from "react";
 import useGetData from "../Hooks/use-get-data.jsx";
+import { useDispatch, useSelector } from "react-redux";
+import AlertMsg from "./AlertMsg.jsx";
 
 const TableShow = (props) => {
     //::: handle props 
-    let { header, dataEndpoint, deleteEndpoint, currentUser, title, addLink, addTitle } = props
+    let { header, SELECTOR, DISPATCHER, DELETEACTION, DELETESELECTOR, currentUser, title, addLink, addTitle } = props
     currentUser = currentUser || { id: '' }
-    /** BRIEF
-     * this value only for users table so we shoud add a default value "{id: ""}" to avoid errors
-     * creating object with empty id value as a default value to avoid calling undefined object's key
-     */
     //:::
 
-    //::: handle all the read endpoints for the tabel using this custom HOOK
-    const { data, isLoading, isEmpty, setRefreshData } = useGetData(dataEndpoint)
+    //::: disable
+    const [tableData, setTableDate] = useState([]) // handle better visualization for deleting
+    const [deletedID, setDeletedID] = useState(null) // target the selected data
+    const [isMsg, setIsMsg] = useState(false)
     //:::
 
-    //:::
-    const [enableToast, setEnableToast] = useState(false)
-    const [disable, setDisable] = useState(true)
-    //:::
+    //::: 
+    const {
+        data,
+        isLoading: isLoadingData,
+        isEmpty: isEmptyData,
+    } = useGetData(DISPATCHER, SELECTOR)
 
-    //:::
     useEffect(() => {
-        setDisable(false)
-    }, [])
+        setTableDate(data)
+    }, [data])
     //:::
 
+    //::: handle delete function
+    const { isLoading: isLoadingDelete, isSuccess: isSuccessDelete, isError: isErrorDelete, success: successDelete, error: errorDelete } = useSelector(DELETESELECTOR)
+    const dispatch = useDispatch()
+    const handleDelete = async (id) => {
+        setDeletedID(id)
+        try {
+            await dispatch(DELETEACTION(id)).unwrap()
+            setDeletedID(null)
+            setTableDate((prev) => prev.filter((pre) => pre.id !== id))
+            setIsMsg(true)
+        } catch (error) {
+            setIsMsg(true)
+        } finally {
+            setDeletedID(null)
+        }
+    }
     //:::
-    useEffect(() => {
-        const delay = 2000
-        const timer = setTimeout(() => setEnableToast(false), [delay])
-        return () => clearTimeout(timer)
-    }, [enableToast])
-    //:::
-
 
     //::: table header
     const headerShow = header.map((head, index) => <th key={index}>{head?.name}</th>)
     //:::
 
-    //::: handle delete function
-    const handleDelete = async (id) => {
-        setDisable(true)
-        try {
-            const res = await AXIOS.delete(`/${deleteEndpoint}/${id}`)
-            setDisable(false)
-            setRefreshData((prev) => !prev)
-            setEnableToast((prev) => !prev)
-            console.log(':::delete data done:::', res)
-        } catch (error) {
-            setDisable(false)
-            console.log('+++delete data error+++', error)
-        } finally {
-            setDisable(false)
-        }
-    }
-    //:::
-
     //::: table data
-    const dataShow = data.map((item, index) => (
+    const dataShow = tableData?.map((item, index) => (
         <tr key={index}>
             {header.map((item2, index2) => (
                 <td key={index2}>
@@ -76,15 +66,15 @@ const TableShow = (props) => {
             ))}
             <td style={{ width: '90px' }}>
                 <NavLink to={`${item?.id}`}>
-                    <Button variant={"primary"} size={"sm"} disabled={disable}>
-                        {disable ? '...' : <FontAwesomeIcon icon={faEdit} size={"xs"} />}
+                    <Button variant={"primary"} size={"sm"} disabled={isLoadingData}>
+                        <FontAwesomeIcon icon={faEdit} size={"xs"} />
                     </Button>
                 </NavLink>
                 <span> </span>
                 {
                     currentUser.id !== item.id &&
-                    <Button variant={"danger"} size={"sm"} onClick={() => handleDelete(item?.id)} id={item?.id} disabled={disable}>
-                        {disable ? '...' : <FontAwesomeIcon icon={faTrash} size={"xs"} />}
+                    <Button variant={"danger"} size={"sm"} onClick={() => handleDelete(item?.id)} id={item?.id} disabled={isLoadingData || isLoadingDelete}>
+                        {isLoadingDelete && deletedID === item?.id ? '...' : <FontAwesomeIcon icon={faTrash} size={"xs"} />}
                     </Button>
                 }
             </td>
@@ -93,7 +83,7 @@ const TableShow = (props) => {
     )
     //:::
 
-    //:::
+    //::: data loading mock up
     const dataLoading = ['', ''].map((item, index) => (
         <tr key={index}>
             {
@@ -115,10 +105,9 @@ const TableShow = (props) => {
     )
     //:::
 
-    //:::
+    //::: data not found jsx
     const dataNotFound = <tr colSpan='12'><td colSpan={12} style={{ textAlign: 'center' }}>No data found</td></tr>
     //:::
-
 
     return (
         <div>
@@ -138,19 +127,25 @@ const TableShow = (props) => {
                     </tr>
                 </thead>
                 <tbody>
-
                     {
-                        isLoading && dataLoading
+                        isLoadingData && dataLoading
                     }
                     {
-                        isEmpty && dataNotFound
+                        isEmptyData && dataNotFound
                     }
-                    {dataShow}
+                    {
+                        !isLoadingData && dataShow
+                    }
                 </tbody>
             </Table>
-            {enableToast &&
-                <ToastMsg data={'you have deleted it successfully'} />
-            }
+            <AlertMsg
+                message={successDelete?.message || errorDelete?.message}
+                isError={isErrorDelete}
+                isSuccess={isSuccessDelete}
+                isMsg={isMsg}
+                setIsMsg={setIsMsg}
+                delay='1000'
+            />
         </div>
     )
 }
