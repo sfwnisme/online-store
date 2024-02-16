@@ -1,0 +1,26 @@
+add images endpoint => /product-img/add =>
+edit product endpoint => /${PRO}/edit/${id} => edit dummy to submit
+add full product endpoint => /${PRO}/add => dummy
+
+[x]- disable all inputs before changing category selection
+[x]- handle posting dummy data
+[]- handle posting images 
+[]- handle uploading the second image group
+
+
+const handleFileUpload = (e) => {
+    let nextFile = [...e.target.files].map((file) => ({ image: file, loading: 0 }))
+    setImages((prev) => [...prev, ...nextFile])
+    let imagesList = e.target.files
+    const fd = new FormData()
+    for (let i = 0; i < imagesList.length; i++) {
+      fd.append(`image${i}`, imagesList[i])
+      fd.append('product_id', productId)
+    }
+    console.log([...e.target.files])
+    AXIOS.post(`/product-img/add`,fd, {
+      onUploadProgress: (event) => {
+        console.log(event)
+      }
+    })
+  }
