@@ -32,7 +32,7 @@ const AddCategory = () => {
       const initialData = formData
       const res = await dispatch(addCategory(initialData)).unwrap()
       setIsMsg(true)
-      location.pathname = '/dashboard/categories'
+      // location.pathname = '/dashboard/categories'
     } catch (error) {
       setIsMsg(true)
       console.log('+++add category error+++', error)

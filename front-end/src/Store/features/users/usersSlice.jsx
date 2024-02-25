@@ -74,7 +74,7 @@ export const getUsers = createAsyncThunk('users/getUsers', async (_, thunkAPI) =
     //Conclusion: you should return a plain js object or array of data not the entire response
     //!DON'T DO ==> return res --> cause non-serialized value error
     //?DO ==> return res?.data --> serialized value
-    const customRes = res?.data
+    const customRes = res?.data?.data
     return fulfillWithValue(customRes)
     // return res.data
   } catch (error) {

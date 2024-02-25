@@ -10,7 +10,8 @@ const AlertMsg = ({ message, isError, isMsg, setIsMsg, delay }) => {
   //:::
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsMsg(false), [delayVariants])
+    let timer
+    timer = setTimeout(() => setIsMsg(false), [delayVariants])
     return () => clearTimeout(timer)
   }, [isMsg])
 

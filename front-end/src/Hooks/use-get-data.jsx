@@ -21,6 +21,7 @@ const useGetData = (DISPATCHER, SELECTOR) => {
     error,
   } = useSelector(SELECTOR)
   //:::
+  console.log(data)
 
   return { data, isLoading, isEmpty, isError, isSuccess, success, error, setRefreshData }
 }

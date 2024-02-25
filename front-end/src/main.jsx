@@ -25,6 +25,8 @@ import { Provider } from 'react-redux'
 import { store } from './Store/api/store.jsx'
 import AddProduct from './Pages/Dashboard/Products/AddProduct.jsx'
 import AddProductNew from './Pages/Dashboard/Products/AddProductNew.jsx'
+import Product from './Pages/Dashboard/Products/Product.jsx'
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 
 //::: users codes
 const admin = '1995'
@@ -34,124 +36,132 @@ const writer = '1996'
 //:::
 
 const router = createBrowserRouter([
-    {
-        element: <App />,
-        path: '/',
-        errorElement: <Err404 />,
+  {
+    element: <App />,
+    path: '/',
+    errorElement: <Err404 />,
+    children: [
+      {
+        element: <HomePage />,
+        index: true,
+
+      },
+      {
+        element: <RequireBack />,
         children: [
-            {
-                element: <HomePage />,
-                index: true,
-
-            },
-            {
-                element: <RequireBack />,
-                children: [
-                    {
-                        element: <Login />,
-                        path: 'login',
-                    },
-                    {
-                        element: <Register />,
-                        path: 'register',
-                    },
-                ]
-            },
-
-            {
-                element: <RequireAuth allowedRole={[admin, writer, productManager]} />,
-                children: [
-                    {
-                        path: 'dashboard',
-                        element: <Dashboard />,
-                        children: [
-                            {
-                                element: <Welcome />,
-                                index: true,
-                            },
-                            // {
-                            //     element: <Users />,
-                            //     path: 'users'
-                            // },
-                            // {
-                            //     element: <User />,
-                            //     path: 'users/:id',
-                            // },
-                            // {
-                            //     element: <AddUser />,
-                            //     path: 'user/add'
-                            // },
-                            {
-                                element: <RequireAuth allowedRole={[admin]} />,
-                                children: [
-                                    {
-                                        element: <Users />,
-                                        path: 'users'
-                                    },
-                                    {
-                                        element: <User />,
-                                        path: 'users/:id',
-                                    },
-                                    {
-                                        element: <AddUser />,
-                                        path: 'user/add'
-                                    }
-                                ]
-                            },
-                            {
-                                element: <RequireAuth allowedRole={[admin, productManager]} />,
-                                children: [
-                                    //::: categories
-                                    {
-                                        element: <Categories />,
-                                        path: 'categories'
-                                    },
-                                    {
-                                        element: <Category />,
-                                        path: 'categories/:id'
-                                    },
-                                    {
-                                        element: <AddCategory />,
-                                        path: 'category/add'
-                                    },
-                                    //::: products
-                                    {
-                                        element: <Products />,
-                                        path: 'products',
-                                    },
-                                    {
-                                        element: <AddProduct />,
-                                        // element: <AddProductCopy />,
-                                        // element: <AddProductNew />,
-                                        path: 'product/add'
-                                    }
-                                ]
-                            },
-                            {
-                                element: <RequireAuth allowedRole={['1995', '1996']} />,
-                                children: [
-                                    {
-                                        element: <Writer />,
-                                        path: 'writer'
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                element: <GoogleCallBack />,
-                path: '/auth/google/callback'
-            }
+          {
+            element: <Login />,
+            path: 'login',
+          },
+          {
+            element: <Register />,
+            path: 'register',
+          },
         ]
-    }
+      },
+
+      {
+        element: <RequireAuth allowedRole={[admin, writer, productManager]} />,
+        children: [
+          {
+            path: 'dashboard',
+            element: <Dashboard />,
+            children: [
+              {
+                element: <Welcome />,
+                index: true,
+              },
+              // {
+              //     element: <Users />,
+              //     path: 'users'
+              // },
+              // {
+              //     element: <User />,
+              //     path: 'users/:id',
+              // },
+              // {
+              //     element: <AddUser />,
+              //     path: 'user/add'
+              // },
+              {
+                element: <RequireAuth allowedRole={[admin]} />,
+                children: [
+                  {
+                    element: <Users />,
+                    path: 'users'
+                  },
+                  {
+                    element: <User />,
+                    path: 'users/:id',
+                  },
+                  {
+                    element: <AddUser />,
+                    path: 'user/add'
+                  }
+                ]
+              },
+              {
+                element: <RequireAuth allowedRole={[admin, productManager]} />,
+                children: [
+                  //::: categories
+                  {
+                    element: <Categories />,
+                    path: 'categories'
+                  },
+                  {
+                    element: <Category />,
+                    path: 'categories/:id'
+                  },
+                  {
+                    element: <AddCategory />,
+                    path: 'category/add'
+                  },
+                  //::: products
+                  {
+                    element: <Products />,
+                    path: 'products',
+                  },
+                  {
+                    element: <AddProduct />,
+                    // element: <AddProductCopy />,
+                    // element: <AddProductNew />,
+                    path: 'product/add'
+                  }
+                  ,
+                  {
+                    element: <Product />,
+                    path: 'products/:id'
+                  }
+                ]
+              },
+              {
+                element: <RequireAuth allowedRole={['1995', '1996']} />,
+                children: [
+                  {
+                    element: <Writer />,
+                    path: 'writer'
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        element: <GoogleCallBack />,
+        path: '/auth/google/callback'
+      }
+    ]
+  }
 ])
 
+const queryClient = new QueryClient()
 ReactDOM.createRoot(document.getElementById('root')).render(
-    // <React.StrictMode>
-    <Provider store={store}>
-        <RouterProvider router={router} />
-    </Provider>
-    // </React.StrictMode>,
+  // <React.StrictMode>
+  <Provider store={store}>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  </Provider>
+  // </React.StrictMode>,
 )

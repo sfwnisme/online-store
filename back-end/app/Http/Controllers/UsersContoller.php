@@ -11,9 +11,10 @@ use Illuminate\Support\Facades\Hash;
 
 class UsersContoller extends Controller
 {
-    public function GetUsers()
+    public function GetUsers(Request $request)
     {
-        return User::all();
+        $users = User::paginate($request->input('limit', 10));
+        return $users;
     }
     // Get Auth User
     public function authUser()

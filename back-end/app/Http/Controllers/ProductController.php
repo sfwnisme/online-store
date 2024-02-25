@@ -14,9 +14,9 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Product::with('Images')->where('status', '=', 'published')->get();
+        return Product::with('Images')->where('status', '=', 'published')->paginate($request->input('limit', 10));
     }
 
     /**
@@ -48,7 +48,7 @@ class ProductController extends Controller
             'About' => $request->About,
             'discount' => $request->discount,
         ]);
-      return $productCreated;
+        return $productCreated;
     }
 
     /**
@@ -56,7 +56,7 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        return Product::where('id', $id)->get();
+        return Product::where('id', $id)->with('Images')->where('status', '=', 'published')->get();
     }
 
     /**

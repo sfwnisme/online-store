@@ -1,0 +1,28 @@
+.pagination-container {
+  list-style: none;
+}
+
+.pagination-anchor {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  line-height: 15px;
+}
+
+.pagination-anchor:hover {
+  background-color: rgba(0, 0, 255, 0.142);
+  transition: var(--tran);
+  -webkit-transition: var(--tran);
+  -moz-transition: var(--tran);
+  -ms-transition: var(--tran);
+  -o-transition: var(--tran);
+}
+
+.pagination-active-link {
+  transition: var(--tran);
+  -webkit-transition: var(--tran);
+  -moz-transition: var(--tran);
+  -ms-transition: var(--tran);
+  -o-transition: var(--tran);
+}

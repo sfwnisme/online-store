@@ -53,7 +53,8 @@ export const getCategories = createAsyncThunk('categories/getCategories', async 
   const { fulfillWithValue, rejectWithValue } = thunkAPI
   try {
     const res = await AXIOS.get(`/${CATS}`)
-    const customRes = res?.data
+    const customRes = res?.data?.data
+    console.log(res.data.data)
     return fulfillWithValue(customRes)
   } catch (error) {
     // const customError = error?.response?.data
@@ -87,6 +88,7 @@ export const getSingleCategory = createAsyncThunk('categories/currentCategory', 
   try {
     const res = await AXIOS.get(`/${CAT}/${id}`)
     const customRes = res?.data
+    console.log(customRes)
     return fulfillWithValue(customRes)
   } catch (error) {
     // const customError = error?.response?.data
@@ -275,7 +277,7 @@ const categoriesSlice = createSlice({
 
 export default categoriesSlice.reducer
 export const categoriesSelector = (state) => state.categories
-export const deleteCategorySelector = (state) => state.categories.deleteData
 export const singleCategorySelector = (state) => state.categories.singleData
+export const deleteCategorySelector = (state) => state.categories.deleteData
 export const updateCategorySelector = (state) => state.categories.updateData
 export const addCategorySelector = (state) => state.categories.addData

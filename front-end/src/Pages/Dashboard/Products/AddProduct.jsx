@@ -44,9 +44,9 @@ const AddProduct = () => {
   const fileRef = useRef(null)
   const progressRef = useRef([])
   const idsRef = useRef([])
-  // const progressRef = innerR([])
+  const lengthRef = useRef(-1)
   //:::
-  // console.log('process ref', progressRef.current)
+
   //:::
   const focusRef = useRef(null)
   useEffect(() => {
@@ -55,7 +55,13 @@ const AddProduct = () => {
   }, [])
   //:::
 
-  //::: posting product
+  /**
+   *! :::::::::::::::::::::::::::::::::::::::::::::::::::::
+   *! FUNCTIONS START :::::::::::::::::::::::::::::::::::::
+   *! :::::::::::::::::::::::::::::::::::::::::::::::::::::
+  */
+
+  //::: submit product product
   const { isLoading, isError, success, error } = useSelector(addProductSelector)
   const dispatch = useDispatch()
 
@@ -70,16 +76,22 @@ const AddProduct = () => {
       formData.append(key, value)
     }
 
-    // // images must write this way "images[]" with empty array
-    // // for the backend to understand it
+    // images must write this way "images[]" with empty array
+    // for the backend to understand it
     // for (let i = 0; i < images.length; i++) {
     //   formData.append('images[]', images[i])
     // }
     console.log(...formData)
-    const initialData = formData
+    const initialData = { formData, productId }
+    console.log(initialData)
 
     try {
       await dispatch(addProduct(initialData)).unwrap()
+      // const res = await AXIOS.post(`${PRO}/edit/${productId}`, initialData.formData)
+      // console.log(':::add product done:::', res)
+      console.log('product id before', productId)
+      location.pathname = '/dashboard/products'
+      console.log('product id after', productId)
       setIsMsg(true)
     } catch (error) {
       setIsMsg(true)
@@ -88,7 +100,7 @@ const AddProduct = () => {
   }
   //:::
 
-  //:::
+  //::: handle dummy
   const handleDummy = async () => {
     try {
       const res = await AXIOS.post(`/${PRO}/add`, dummyForm)
@@ -105,14 +117,13 @@ const AddProduct = () => {
   const handleChange = (e) => {
     const value = e.target.value
     const name = e.target.name
-    setForm({ ...form, [name]: value })
+    setForm((prev) => ({ ...prev, [name]: value }))
     setDummySent(true)
     // return the dummy funtion only single time to avoid repeated requests
     !dummySent ? handleDummy() : null
   }
   //:::
 
-  const lengthRef = useRef(0)
 
   //::: handle images posting
   const handleUploadImages = async (e) => {
@@ -125,6 +136,7 @@ const AddProduct = () => {
       formData.append('image', imagesList[i])
       formData.append('product_id', productId)
       try {
+        lengthRef.current++
         setFreezeOnUploading(true)
         const res = await AXIOS.post(`/product-img/add`, formData, {
           onUploadProgress: (ProgressEvent) => {
@@ -137,9 +149,10 @@ const AddProduct = () => {
           }
         })
         console.log('uploads of images>>>>>>>>>>>', res)
-        lengthRef.current++
+        // lengthRef.current++
         setFreezeOnUploading(false)
-        idsRef.current[lengthRef.current - 1] = res?.data?.id
+        // idsRef.current[lengthRef.current - 1] = res?.data?.id
+        idsRef.current[lengthRef.current] = res?.data?.id
         console.log(idsRef.current)
       } catch (error) {
         console.log('images error', error)
@@ -148,23 +161,7 @@ const AddProduct = () => {
   }
   //:::
 
-  //:::
-  const { data: categories } = useGetData(getCategories, categoriesSelector)
-  const showCategories = categories.map((cat) => <option value={cat.id} key={cat.id}>{cat.title}</option>)
-  //:::
-
-
-  //:::
-  const handleImagePreview = (e) => {
-    const { src } = e.target
-    setPreview(true)
-    setImageToPreview(src)
-    console.log(preview)
-  }
-  console.log('image availibility', preview)
-  //:::
-
-  //:::
+  //::: REMOVE PRODUCT
   const removeImage = async (img, id) => {
     console.log(img, id)
     const findId = idsRef.current[id]
@@ -184,6 +181,27 @@ const AddProduct = () => {
   console.log(idsRef.current)
   console.log(lengthRef.current)
   console.log(progressRef.current)
+
+  //:::
+  const handleImagePreview = (e) => {
+    const { src } = e.target
+    setPreview(true)
+    setImageToPreview(src)
+    console.log(preview)
+  }
+  console.log('image availibility', preview)
+  //:::
+
+  /**
+   *! :::::::::::::::::::::::::::::::::::::::::::::::::::::
+   *! FUNCTIONS END :::::::::::::::::::::::::::::::::::::::
+   *! :::::::::::::::::::::::::::::::::::::::::::::::::::::
+  */
+
+  //:::
+  const { data: categories } = useGetData(getCategories, categoriesSelector)
+  const showCategories = categories.map((cat) => <option value={cat.id} key={cat.id}>{cat.title}</option>)
+  //:::
 
   //:::
   // URL.createObjectURL(image) - is an js API to convert image object file to image url
@@ -222,7 +240,7 @@ const AddProduct = () => {
       <div className='form-container form-noimage'>
         <div className='form-box'>
           <h1>Add User</h1>
-          <Form onSubmit={handleDummy}>
+          <Form onSubmit={Submit}>
 
             <Form.Group className="mb-4 input-container">
               <Form.Select type='text' id="category" name='category' placeholder=""
