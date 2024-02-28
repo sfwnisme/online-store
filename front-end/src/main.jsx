@@ -20,13 +20,12 @@ import Welcome from "./Pages/Dashboard/Welcome.jsx";
 import AddCategory from './Pages/Dashboard/Categories/AddCategory.jsx'
 import Category from './Pages/Dashboard/Categories/Category.jsx'
 import Products from './Pages/Dashboard/Products/Products.jsx'
-import AddProductCopy from './Pages/Dashboard/Products/AddProductCopy.jsx'
 import { Provider } from 'react-redux'
 import { store } from './Store/api/store.jsx'
 import AddProduct from './Pages/Dashboard/Products/AddProduct.jsx'
-import AddProductNew from './Pages/Dashboard/Products/AddProductNew.jsx'
 import Product from './Pages/Dashboard/Products/Product.jsx'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 //::: users codes
 const admin = '1995'
@@ -161,6 +160,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
+      <ReactQueryDevtools />
     </QueryClientProvider>
   </Provider>
   // </React.StrictMode>,

@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query'
 const Categories = () => {
     //:::
     const [page, setPage] = useState(1)
-    const [limit, setLimit] = useState(30)
+    const [limit, setLimit] = useState(5)
     //:::
 
     //::: tab title
@@ -52,6 +52,7 @@ const Categories = () => {
                 page={page}
                 setPage={setPage}
                 ENDPOINT={CATS}
+                searchEndpoint={CAT}
             />
         </div>
     )

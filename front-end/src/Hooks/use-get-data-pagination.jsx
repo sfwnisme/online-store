@@ -5,13 +5,15 @@ const useGetDataPagination = (ENDPOINT, limit, page) => {
   const gettingData = async (ENDPOINT, limit, page) => await AXIOS.get(`/${ENDPOINT}?limit=${limit}&page=${page}`)
 
   const { data, status, isLoading, isError, isSuccess, error, refetch } = useQuery({
-    queryKey: [ENDPOINT],
-    queryFn: () => gettingData(ENDPOINT, limit, page)
+    queryKey: [ENDPOINT, limit, page],
+    queryFn: () => gettingData(ENDPOINT, limit, page),
+    gcTime: 0,
+    staleTime: 0,
+    // refetchOnWindowFocus: true
   })
-  console.log(data?.data?.data)
   const success = 'The user has been successfully grapped'
 
-  return { data: data?.data?.data, status, isLoading, isError, isSuccess, success, error, refetch }
+  return { data: data?.data?.data, status, isLoading, isError, isSuccess, success, error, refetch, total: data?.data?.total }
 }
 
 export default useGetDataPagination

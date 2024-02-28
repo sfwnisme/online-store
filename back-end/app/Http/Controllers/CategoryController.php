@@ -87,6 +87,15 @@ class CategoryController extends Controller
         //
     }
 
+     // Search On Users
+     public function search(Request $request)
+     {
+            $query = $request->input('title');
+            $results = Category::where('title', 'like', "%$query%")->get();
+            return response()->json($results);
+     }
+
+
     /**
      * Remove the specified resource from storage.
      */

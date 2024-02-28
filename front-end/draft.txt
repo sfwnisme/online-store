@@ -1,2 +1,5 @@
-[ ] - create custom pagination using the react-pagination library
-[ ] - handle pages and limitations of the data preview
+- create searching using api /category/search?title=searchValue
+- handle the search loading
+- create debouncing for the search algorithm
+- get search data by searching only 
+- memomize the data 

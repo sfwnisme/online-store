@@ -9,7 +9,7 @@ const Users = () => {
     //:::usnig this hook instead of fetching data inside the component
     // const { currentUser } = useSignedUser()
     const [page, setPage] = useState(1)
-    const [limit, setLimit] = useState(5)
+    const [limit, setLimit] = useState(3)
     const { data: currentUser } = useSelector(currentUserSelector)
     //:::
 

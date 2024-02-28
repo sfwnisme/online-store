@@ -64,6 +64,14 @@ class UsersContoller extends Controller
         $user->save();
     }
 
+    // Search On Users
+    public function search(Request $request)
+     {
+            $query = $request->input('title');
+            $results = User::where('name', 'like', "%$query%")->get();
+            return response()->json($results);
+     }
+
     // Delete User
     public function destroy($id)
     {

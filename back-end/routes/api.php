@@ -40,6 +40,7 @@ Route::middleware('auth:api')->group(function () {
     Route::middleware('checkAdmin')->controller(UsersContoller::class)->group(function () {
         Route::get('/users', 'GetUsers');
         Route::get('/user/{id}', 'getUser');
+        Route::post('/user/search', 'search');
         Route::post('/user/edit/{id}', 'editUser');
         Route::post('/user/add', 'addUser');
         Route::delete('/user/{id}', 'destroy');
@@ -48,6 +49,7 @@ Route::middleware('auth:api')->group(function () {
     Route::middleware('checkProductManager')->controller(CategoryController::class)->group(function () {
         Route::get('/categories', 'index');
         Route::get('/category/{id}', 'show');
+        Route::post('/category/search', 'search');
         Route::post('/category/edit/{id}', 'edit');
         Route::post('/category/add', 'store');
         Route::delete('/category/{id}', 'destroy');
@@ -56,6 +58,7 @@ Route::middleware('auth:api')->group(function () {
     Route::middleware('checkProductManager')->controller(ProductController::class)->group(function () {
         Route::get('/products', 'index');
         Route::get('/product/{id}', 'show');
+        Route::post('/product/search', 'search');
         Route::post('/product/edit/{id}', 'update');
         Route::post('/product/add', 'store');
         Route::delete('/product/{id}', 'destroy');
