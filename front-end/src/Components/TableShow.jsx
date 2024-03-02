@@ -32,6 +32,8 @@ const TableShow = (props) => {
   const [search, setSearch] = useState('')
   const [searchIsLoading, setSearchIsLoading] = useState(false)
   //:::
+
+  // switch between the data and the searched data
   const dataOrSearch = search?.length > 0 ? filteredData : tableData
 
   //::: pagination
@@ -109,7 +111,8 @@ const TableShow = (props) => {
   }
 
   // search funtion
-  const handleSearch = useCallback(async () => {
+  console.log(searchIsLoading)
+  const handleSearch = async () => {
     try {
       const res = await AXIOS.post(`/${props?.searchEndpoint}/search?title=${search}`)
       setFilteredData(res?.data)
@@ -118,14 +121,14 @@ const TableShow = (props) => {
     } finally {
       setSearchIsLoading(false)
     }
-  }, [search, props?.searchEndpoint])
-
+  }
+  
   useEffect(() => {
     setSearchIsLoading(true)
-    const delay = 500
+    // debaouce(search?.length > 0 ? handleSearch() : setSearchIsLoading(false), 500)
     const timer = setTimeout(() => {
       search?.length > 0 ? handleSearch() : setSearchIsLoading(false)
-    }, [delay])
+    }, [500])
     return () => clearTimeout(timer)
   }, [search])
 
@@ -199,17 +202,19 @@ const TableShow = (props) => {
   )
   )
 
-  const searchIsLoadingData = newArray.fill('').map((item, index) => (
-    <tr key={index} style={{ filter: 'grayscale(1)' }} >
-      {
-        header.map((item2, index) => <td key={index}>loading...</td>)
-      }
-      <td colSpan={12} style={{ width: '100px' }}>
-        Searchin....
-      </td>
-    </tr>
-  )
-  )
+  // searching status
+  const searchIsLoadingData = <tr>
+    <td colSpan={12} style={{ width: '100px', textAlign: 'center' }}>
+      Searching....
+    </td>
+  </tr>
+
+  // searching not found status
+  const searchNotFound = <tr>
+    <td colSpan={12} style={{ width: '100px', textAlign: 'center' }}>
+      Data you seaching for is not found!!!
+    </td>
+  </tr>
 
 
 
@@ -218,49 +223,71 @@ const TableShow = (props) => {
 
 
   // displayed data
-  let content;
-  if (isLoadingData && !searchIsLoading) {
-    content = dataLoading
-  } else if (!isLoadingData && searchIsLoading) {
-    content = searchIsLoadingData
-  } else if (!isLoadingData && !searchIsLoading && tableData?.length != 0 || filteredData?.length != 0) {
-    console.log('')
-    content = dataShow
-  } else if (!isLoadingData && !searchIsLoading && tableData?.length == 0 && filteredData?.length === 0) {
-    console.log('not found')
-    content = dataNotFound
-  } else if (!isLoadingData && !searchIsLoading  && tableData?.length > 0 && filteredData?.length === 0) {
-    console.log('search not found')
-    content = <h1>searchin...</h1>
+  // let content;
+
+  // content =  if (isLoadingData && !searchIsLoading) {
+  //   return dataLoading
+  // } else if (!isLoadingData && searchIsLoading) {
+  //   return searchIsLoadingData
+  // } else if (!isLoadingData && !searchIsLoading && tableData?.length != 0 || filteredData?.length != 0) {
+  //   console.log('')
+  //   return dataShow
+  // } else if (!isLoadingData && !searchIsLoading && tableData?.length == 0 && filteredData?.length === 0) {
+  //   console.log('not found')
+  //   return dataNotFound
+  // } else if (searchIsEmtpy == true) {
+  //   console.log('search not found')
+  //   // return <tr>
+  //   //   <td colSpan={12} style={{ width: '100px' }}>
+  //   //     Searchin....
+  //   //   </td>
+  //   // </tr>
+  //   content = dataNotFound
+  // }
+  // console.log(searchIsEmtpy)
+  let content = () => {
+    if (isLoadingData && !searchIsLoading) {
+      return dataLoading
+    } else if (!isLoadingData && searchIsLoading) {
+      return searchIsLoadingData
+    } else if (!isLoadingData && !searchIsLoading && tableData?.length == 0 && filteredData?.length !== 0) {
+      console.log('not found')
+      return dataNotFound
+    } else if (search?.length > 0 && filteredData?.length === 0) {
+      console.log('search not found')
+      return searchNotFound
+    } else {
+      console.log('')
+      return dataShow
+    }
+
   }
-
-  console.log(filteredData)
-
 
   return (
     <div>
-      <div className="d-flex align-items-center justify-content-center gap-2">
-        <Form.Control
-          type='text'
-          id="price"
-          name='price'
-          placeholder=""
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        {search?.length === 0 ?
-          <>
-            <select name="" id="" onChange={(e) => props?.setLimit(e.target.value)}>
-              <option value="3">3</option>
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
-            </select>
-            <Pagination itemsPerPage={props?.limit} data={tableData} page={props?.page} setPage={props?.setPage} limit={props?.limit} setLimit={props?.setLimit} total={total} />
-          </>
-          : null
-        }
-      </div>
+      <Form.Control
+        type='text'
+        id="search"
+        name='search'
+        placeholder=""
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        style={{ flexBasis: '100%' }}
+      />
+
+      {search?.length === 0 ?
+        <div className="d-flex align-items-center justify-content-center gap-2">
+
+          <select name="" id="" onChange={(e) => props?.setLimit(e.target.value)}>
+            <option value="3">3</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+          </select>
+          <Pagination itemsPerPage={props?.limit} data={tableData} page={props?.page} setPage={props?.setPage} limit={props?.limit} setLimit={props?.setLimit} total={total} />
+        </div>
+        : null
+      }
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <h1>{title}</h1>
         <NavLink to={addLink}>
@@ -286,7 +313,7 @@ const TableShow = (props) => {
           {
             !isLoadingData && dataShow
           } */}
-          {content}
+          {content()}
         </tbody>
       </Table>
       <AlertMsg
