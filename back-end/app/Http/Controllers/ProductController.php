@@ -113,7 +113,7 @@ class ProductController extends Controller
      public function search(Request $request)
      {
             $query = $request->input('title');
-            $results = Product::where('title', 'like', "%$query%")->get();
+            $results = Product::with('images')->where('title', 'like', "%$query%")->get();
             return response()->json($results);
      }
 

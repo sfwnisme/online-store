@@ -65,9 +65,10 @@ class UsersContoller extends Controller
     }
 
     // Search On Users
+    // sfwn changed this $query = $request->input('title'); to this $query = $request->input('name');
     public function search(Request $request)
      {
-            $query = $request->input('title');
+            $query = $request->input('name');
             $results = User::where('name', 'like', "%$query%")->get();
             return response()->json($results);
      }
